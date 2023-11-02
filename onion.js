@@ -95,6 +95,7 @@ async function scrape() {
 }
 async function go() {
   const data = await scrape();
+  const imagename = Date.now().toString();
 
 //   const image = fs.readFileSync("./image.jpg");
 //   const base64Image = new Buffer.from(image).toString("base64");
@@ -103,7 +104,7 @@ async function go() {
   // const font2base64 = require('node-font2base64')
   // const _data = font2base64.encodeToDataUrlSync('./font.ttf')
   nodeHtmlToImage({
-    output: "./image2.png",
+    output: "./images/" + imagename + ".png",
     handlebarsHelpers: {
       notequals: (a, b) => a != b,
     },
@@ -198,11 +199,11 @@ async function go() {
   }).then(() => {
     console.log("The images were created successfully!");
 
-    const image3 = fs.readFileSync("./image2.png");
+    const image3 = fs.readFileSync("./images/" + imagename + ".png");
     const base64Image3 = new Buffer.from(image3).toString("base64");
     var formdata = new FormData();
     formdata.append("image", base64Image3);
-    formdata.append("name", Date.now().toString());
+    formdata.append("name", imagename);
     fetch("https://api.imgbb.com/1/upload?key=" + process.env.IMGBB_APIKEY, {
       body: formdata,
       method: "POST",
