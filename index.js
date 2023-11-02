@@ -96,9 +96,9 @@ async function scrape() {
 async function go() {
   const data = await scrape();
 
-  const image = fs.readFileSync("./image.jpg");
-  const base64Image = new Buffer.from(image).toString("base64");
-  const dataURI = "data:image/jpeg;base64," + base64Image;
+//   const image = fs.readFileSync("./image.jpg");
+//   const base64Image = new Buffer.from(image).toString("base64");
+//   const dataURI = "data:image/jpeg;base64," + base64Image;
   const onionImage = "data:image/jpeg;base64," + base64Image2;
   // const font2base64 = require('node-font2base64')
   // const _data = font2base64.encodeToDataUrlSync('./font.ttf')
