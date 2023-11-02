@@ -103,6 +103,7 @@ async function go() {
   const onionImage = "data:image/jpeg;base64," + base64Image2;
   // const font2base64 = require('node-font2base64')
   // const _data = font2base64.encodeToDataUrlSync('./font.ttf')
+  console.log('starting image generation')
   nodeHtmlToImage({
     output: "./images/" + imagename + ".png",
     handlebarsHelpers: {
