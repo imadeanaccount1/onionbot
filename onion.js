@@ -226,6 +226,7 @@ async function go() {
 
             if (res1.error) {
               console.error(res1.error);
+              throw new Error("error while authenticating with wasteof", res1.error);
               return;
             }
             fetch("https://api.wasteof.money/posts", {
@@ -242,6 +243,7 @@ async function go() {
               .then((res2) => {
                 if (res2.error) {
                   console.error(res2.error);
+                  throw new Error("error while posting post", res2.error);
                   return;
                 }
               });
@@ -249,7 +251,11 @@ async function go() {
       })
       .catch((error) => {
         console.error(error);
+        throw new Error("error while uploading image", error)
       });
+  }).catch((error) => {
+    console.error(error);
+    throw new Error("error while generating image", error)
   });
 }
 
