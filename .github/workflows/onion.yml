@@ -12,7 +12,10 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    env:
+        IMGBB_APIKEY: ${{ secrets.IMGBB_APIKEY }} 
+        WASTEOF_USERNAME: ${{ secrets.WASTEOF_USERNAME }} 
+        WASTEOF_PASSWORD: ${{ secrets.WASTEOF_PASSWORD }} 
     strategy:
       matrix:
         node-version: [18.x]
@@ -26,6 +29,7 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: node onion.js
+      
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Changed files
