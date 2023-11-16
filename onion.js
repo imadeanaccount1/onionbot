@@ -11,7 +11,7 @@ const test = require("dotenv").config();
 
 async function scrape() {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
   });
   const pageOne = await browser.newPage();
   await pageOne.goto("https://www.theonion.com/latest");
