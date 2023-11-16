@@ -11,7 +11,7 @@ const test = require("dotenv").config();
 
 async function scrape() {
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: false,
   });
   const pageOne = await browser.newPage();
   await pageOne.goto("https://www.theonion.com/latest");
@@ -22,12 +22,24 @@ async function scrape() {
     await pageOne.waitForTimeout(3000);
 
     await pageOne.evaluate((_) => {
+      if (document
+        .querySelector("time")
+        .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
+          "video"
+        )) {
+          document
+        .querySelector("time")
+        .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
+          "video"
+        ).scrollIntoView();
+        } else {
       document
         .querySelector("time")
         .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
           "img"
         )
         .scrollIntoView();
+        }
     });
     await pageOne.waitForTimeout(500);
 
@@ -52,7 +64,15 @@ async function scrape() {
               .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
                 "p"
               ).textContent,
-        document
+              document
+              .querySelector("time")
+              .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
+                "video"
+              ) ? document
+              .querySelector("time")
+              .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
+                "video"
+              ).poster : document
           .querySelector("time")
           .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
             "img"
