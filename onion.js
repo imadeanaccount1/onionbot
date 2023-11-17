@@ -8,10 +8,11 @@ const image2 = fs.readFileSync("./onion.png");
 const base64Image2 = new Buffer.from(image2).toString("base64");
 
 const test = require("dotenv").config();
+filter.addWords(...process.env.BADWORDS.split(","));
 
 async function scrape() {
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: "new",
   });
   const pageOne = await browser.newPage();
   await pageOne.goto("https://www.theonion.com/latest");
@@ -137,12 +138,32 @@ async function go() {
       height: 740px;
       margin: 0px;
       padding: 0px;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      
+
     }
+    .bg2{
+      z-index: -100;
+      width: 1315px;
+      height: 740px;
+      object-fit: cover;
+      position: absolute;
+      top:0px;
+      left:0px;
+      filter: brightness(80%) blur(8px);
+      -webkit-filter: brightness(80%) blur(8px);
+  }
     .bg {
-        width: 1315px;
+        z-index: 100;
         height: 740px;
         object-fit: contain;
+        align-self: center;
+        justify-self: center;
+
     }
+
     .with-eight {
         text-shadow:
             0.044em 0 black,
@@ -162,9 +183,13 @@ async function go() {
         font-weight: 700;
         color: white;
         0px 0px 10px rgba(0,0,0,0.75);
+        z-index: 600;
+
 
     }
     .preview {
+      z-index: 500;
+
         position: absolute;
         bottom: 18px;
         right: 40px;
@@ -189,6 +214,8 @@ async function go() {
         color: white;
         text-shadow: 0px 0px 7px 0px rgba(0,0,0,0.75);
         box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.75);
+        z-index: 700;
+
     }
     .onion {
         position: absolute;
@@ -197,10 +224,14 @@ async function go() {
         filter: drop-shadow(0px 0px 10px rgba(0,0,0,0.75));
         width: 76px;
         height: 76px;
+        z-index: 800;
+
     }
   </style>
 </head>
 <body>
+<img class="bg2" src="{{imageSource}}" />
+
 <img class="bg" src="{{imageSource}}" />
 <p class="headline with-eight">{{headline}}</p>
 {{#if (notequals preview '')}}
