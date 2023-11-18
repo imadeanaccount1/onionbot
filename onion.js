@@ -297,6 +297,14 @@ async function go() {
                   throw new Error("error while posting post", res2.error);
                   return;
                 }
+                console.log(res2.id)
+                fetch("https://api.wasteof.money/posts/" + res2.id + "/loves", {
+                  method: "POST",
+                  headers: {
+                    Authorization: res1.token,
+                    "Content-Type": "application/json",
+                  }
+                })
               });
           });
       })

@@ -3,3 +3,4 @@
 .env
 .env.local
 bash.exe.stackdump
+template.html
