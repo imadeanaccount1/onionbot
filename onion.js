@@ -17,7 +17,7 @@ const test = require("dotenv").config();
 
 async function scrape() {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: "new",
   });
   const pageOne = await browser.newPage();
   await pageOne.goto("https://www.theonion.com/latest");
@@ -304,7 +304,7 @@ async function go() {
         
         myGroup2.appendChild(dat2)
         console.log('translate(0,' + Math.round(40 - dat2.getBBox().height).toString() + ')')
-        dat2.setAttribute('transform',  'translate(0,' + Math.round(40 - dat2.getBBox().height).toString() + ')')
+        dat2.setAttribute('transform',  'translate(0,' + Math.round(150 - (dat2.getBBox().height+dat.getBBox().height)).toString() + ')')
         
       }, data[0], data[2]);
     },

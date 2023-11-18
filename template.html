@@ -40,6 +40,7 @@ const dat = wrapSvgText({
       width: "2015px",
   }
 });
+
 dat.id = 'test'
 const dat2 = wrapSvgText({
   text: "Mac Jones Reveals He Called Tom Brady To Discuss Never Calling Tom Brady Again",
@@ -72,7 +73,7 @@ child.setAttribute('y', parseInt(child.getAttribute('y')) + 2540.52);
 
 myGroup2.appendChild(dat2)
 console.log('translate(0,' + Math.round(40 - dat2.getBBox().height).toString() + ')')
-dat2.setAttribute('transform',  'translate(0,' + Math.round(40 - dat2.getBBox().height).toString() + ')')
+dat2.setAttribute('transform',  'translate(0,' + Math.round(150 - (dat2.getBBox().height+dat.getBBox().height)).toString() + ')')
 
 </script>
 </body>
