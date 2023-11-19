@@ -16,7 +16,7 @@ jobs:
         IMGBB_APIKEY: ${{ secrets.IMGBB_APIKEY }} 
         WASTEOF_USERNAME: ${{ secrets.WASTEOF_USERNAME }} 
         WASTEOF_PASSWORD: ${{ secrets.WASTEOF_PASSWORD }} 
-        BADWORDS: ${{ BADWORDS }}
+        BADWORDS: ${{ secrets.BADWORDS }}
     strategy:
       matrix:
         node-version: [18.x]
