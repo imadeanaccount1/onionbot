@@ -331,6 +331,7 @@ async function go() {
     },
     html: `<html>
     <head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Condensed">
     <style> 
     body {
       margin: 0;
