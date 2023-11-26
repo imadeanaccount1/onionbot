@@ -17,6 +17,8 @@ const test = require("dotenv").config();
 filter.addWords(...process.env.BADWORDS.split(","));
 
 async function scrape() {
+  let posts = JSON.parse(await fs.readFileSync("./images/posts.json"))
+
   const browser = await puppeteer.launch({
     headless: "new",
   });
@@ -29,24 +31,27 @@ async function scrape() {
     await pageOne.waitForTimeout(3000);
 
     await pageOne.evaluate((_) => {
-      if (document
-        .querySelector("time")
-        .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
-          "video"
-        )) {
-          document
-        .querySelector("time")
-        .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
-          "video"
-        ).scrollIntoView();
-        } else {
-      document
-        .querySelector("time")
-        .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
-          "img"
-        )
-        .scrollIntoView();
-        }
+      if (
+        document
+          .querySelector("time")
+          .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
+            "video"
+          )
+      ) {
+        document
+          .querySelector("time")
+          .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
+            "video"
+          )
+          .scrollIntoView();
+      } else {
+        document
+          .querySelector("time")
+          .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
+            "img"
+          )
+          .scrollIntoView();
+      }
     });
     await pageOne.waitForTimeout(500);
 
@@ -71,19 +76,21 @@ async function scrape() {
               .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
                 "p"
               ).textContent,
-              document
-              .querySelector("time")
-              .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
-                "video"
-              ) ? document
-              .querySelector("time")
-              .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
-                "video"
-              ).poster : document
+        document
           .querySelector("time")
           .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
-            "img"
-          ).src,
+            "video"
+          )
+          ? document
+              .querySelector("time")
+              .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
+                "video"
+              ).poster
+          : document
+              .querySelector("time")
+              .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(
+                "img"
+              ).src,
         document
           .querySelector("time")
           .parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.querySelectorAll(
@@ -106,7 +113,7 @@ async function scrape() {
       firstDivText[3],
       firstDivText[4],
     ];
-    if (data[0].includes("**") || data[2].includes("**")) {
+    if (data[0].includes("**") || data[2].includes("**") || posts.filter(post => post.title == data[0]).length > 0) {
       await pageOne.evaluate((_) => {
         document
           .querySelector("time")
@@ -121,16 +128,18 @@ async function scrape() {
   return data;
 }
 async function go() {
+  let posts = JSON.parse(await fs.readFileSync("./images/posts.json"))
+
   const data = await scrape();
   const imagename = Date.now().toString();
 
-//   const image = fs.readFileSync("./image.jpg");
-//   const base64Image = new Buffer.from(image).toString("base64");
-//   const dataURI = "data:image/jpeg;base64," + base64Image;
+  //   const image = fs.readFileSync("./image.jpg");
+  //   const base64Image = new Buffer.from(image).toString("base64");
+  //   const dataURI = "data:image/jpeg;base64," + base64Image;
   const onionImage = "data:image/jpeg;base64," + base64Image2;
   // const font2base64 = require('node-font2base64')
   // const _data = font2base64.encodeToDataUrlSync('./font.ttf')
-  console.log('starting image generation')
+  console.log("starting image generation");
   nodeHtmlToImage({
     output: "./images/" + imagename + ".png",
     handlebarsHelpers: {
@@ -143,7 +152,7 @@ async function go() {
       //   const document = document;
       //   wrapSvgText(options, document);
       // };
-      console.log('before screenshot', data[0])
+      console.log("before screenshot", data[0]);
       await page.exposeFunction("wrapSvg", wrapSvgText);
       await page.exposeFunction("data", await data);
       await page.exposeFunction("testText", data[0]);
@@ -154,180 +163,243 @@ async function go() {
       // page.injectFile('./node_modules/wrap-svg-text/index.min.js')
       // .then(result => console.log(result))
       // .then(error => console.log(error));
-      await page.evaluate(async (headline, preview) => {
-        // const func = Function(wrapSvgStr)
-        (function(){
-          var ns, flush, main;
-          ns = "http://www.w3.org/2000/svg";
-          flush = function(o){
-            var text;
-            if (isNaN(o.x + o.y) || !o.text) {
-              return;
-            }
-            text = document.createElementNS(ns, 'text');
-            text.appendChild(document.createTextNode(o.text));
-            text.setAttribute('x', o.x - 1);
-            text.setAttribute('y', o.y + 2);
-            text.setAttribute('dominant-baseline', 'hanging');
-            return text;
-          };
-          main = function(opt){
-            var text, style, div, ref$, divbox, range, obj, texts, i$, to$, j, t, tt, j$, to1$, i, box, that, g, spans;
-            opt == null && (opt = {});
-            text = opt.text, style = opt.style;
-            style = opt.style || {};
-            text = opt.text || '';
-            if (opt.node) {
-              div = opt.node;
-              if (!text) {
-                text = div.textContent;
+      await page.evaluate(
+        async (headline, preview) => {
+          // const func = Function(wrapSvgStr)
+          (function () {
+            var ns, flush, main;
+            ns = "http://www.w3.org/2000/svg";
+            flush = function (o) {
+              var text;
+              if (isNaN(o.x + o.y) || !o.text) {
+                return;
               }
-              div.textContent = "";
-            } else {
-              div = document.createElement('div');
-              import$((ref$ = div.style, ref$.opacity = 0, ref$["pointer-events"] = 'none', ref$["z-index"] = 0, ref$["position"] = 'absolute', ref$.top = 0, ref$.left = 0, ref$), style);
-              document.body.appendChild(div);
-            }
-            if (opt.useRange) {
-              div.innerText = text;
-              divbox = div.getBoundingClientRect();
-              range = document.createRange();
-              obj = {
-                text: "",
-                x: NaN,
-                y: NaN
-              };
-              texts = [];
-              for (i$ = 0, to$ = div.childNodes.length; i$ < to$; ++i$) {
-                j = i$;
-                t = div.childNodes[j];
-                tt = t.textContent;
-                for (j$ = 0, to1$ = t.length; j$ < to1$; ++j$) {
-                  i = j$;
-                  range.setStart(t, i);
-                  range.setEnd(t, i + 1);
-                  box = range.getBoundingClientRect();
+              text = document.createElementNS(ns, "text");
+              text.appendChild(document.createTextNode(o.text));
+              text.setAttribute("x", o.x - 1);
+              text.setAttribute("y", o.y + 2);
+              text.setAttribute("dominant-baseline", "hanging");
+              return text;
+            };
+            main = function (opt) {
+              var text,
+                style,
+                div,
+                ref$,
+                divbox,
+                range,
+                obj,
+                texts,
+                i$,
+                to$,
+                j,
+                t,
+                tt,
+                j$,
+                to1$,
+                i,
+                box,
+                that,
+                g,
+                spans;
+              opt == null && (opt = {});
+              (text = opt.text), (style = opt.style);
+              style = opt.style || {};
+              text = opt.text || "";
+              if (opt.node) {
+                div = opt.node;
+                if (!text) {
+                  text = div.textContent;
+                }
+                div.textContent = "";
+              } else {
+                div = document.createElement("div");
+                import$(
+                  ((ref$ = div.style),
+                  (ref$.opacity = 0),
+                  (ref$["pointer-events"] = "none"),
+                  (ref$["z-index"] = 0),
+                  (ref$["position"] = "absolute"),
+                  (ref$.top = 0),
+                  (ref$.left = 0),
+                  ref$),
+                  style
+                );
+                document.body.appendChild(div);
+              }
+              if (opt.useRange) {
+                div.innerText = text;
+                divbox = div.getBoundingClientRect();
+                range = document.createRange();
+                obj = {
+                  text: "",
+                  x: NaN,
+                  y: NaN,
+                };
+                texts = [];
+                for (i$ = 0, to$ = div.childNodes.length; i$ < to$; ++i$) {
+                  j = i$;
+                  t = div.childNodes[j];
+                  tt = t.textContent;
+                  for (j$ = 0, to1$ = t.length; j$ < to1$; ++j$) {
+                    i = j$;
+                    range.setStart(t, i);
+                    range.setEnd(t, i + 1);
+                    box = range.getBoundingClientRect();
+                    if (obj.y === box.y - divbox.y) {
+                      obj.text += tt[i];
+                    } else {
+                      if ((that = flush(obj))) {
+                        texts.push(that);
+                      }
+                      obj.text = tt[i];
+                      obj.x = box.x - divbox.x;
+                      obj.y = box.y - divbox.y;
+                    }
+                  }
+                }
+                if ((that = flush(obj))) {
+                  texts.push(that);
+                }
+                g = document.createElementNS(ns, "g");
+              } else {
+                spans = text.split("").map(function (t) {
+                  var span;
+                  div.appendChild((span = document.createElement("span")));
+                  span.appendChild(document.createTextNode(t));
+                  return span;
+                });
+                divbox = div.getBoundingClientRect();
+                obj = {
+                  text: "",
+                  x: NaN,
+                  y: NaN,
+                };
+                texts = [];
+                spans.map(function (it) {
+                  var box, that;
+                  box = it.getBoundingClientRect();
                   if (obj.y === box.y - divbox.y) {
-                    obj.text += tt[i];
+                    return (obj.text += it.textContent);
                   } else {
-                    if (that = flush(obj)) {
+                    if ((that = flush(obj))) {
                       texts.push(that);
                     }
-                    obj.text = tt[i];
+                    obj.text = it.textContent;
                     obj.x = box.x - divbox.x;
-                    obj.y = box.y - divbox.y;
+                    return (obj.y = box.y - divbox.y);
                   }
+                });
+                if ((that = flush(obj))) {
+                  texts.push(that);
                 }
+                g = document.createElementNS(ns, "g");
               }
-              if (that = flush(obj)) {
-                texts.push(that);
-              }
-              g = document.createElementNS(ns, "g");
-            } else {
-              spans = text.split('').map(function(t){
-                var span;
-                div.appendChild(span = document.createElement('span'));
-                span.appendChild(document.createTextNode(t));
-                return span;
+              texts.map(function (it) {
+                return g.appendChild(it);
               });
-              divbox = div.getBoundingClientRect();
-              obj = {
-                text: "",
-                x: NaN,
-                y: NaN
-              };
-              texts = [];
-              spans.map(function(it){
-                var box, that;
-                box = it.getBoundingClientRect();
-                if (obj.y === box.y - divbox.y) {
-                  return obj.text += it.textContent;
-                } else {
-                  if (that = flush(obj)) {
-                    texts.push(that);
-                  }
-                  obj.text = it.textContent;
-                  obj.x = box.x - divbox.x;
-                  return obj.y = box.y - divbox.y;
-                }
-              });
-              if (that = flush(obj)) {
-                texts.push(that);
+              if (!opt.node) {
+                document.body.removeChild(div);
+              } else {
+                div.textContent = div.textContent;
               }
-              g = document.createElementNS(ns, "g");
+              return g;
+            };
+            if (typeof module != "undefined" && module !== null) {
+              module.exports = main;
+            } else if (typeof window != "undefined" && window !== null) {
+              window.wrapSvgText1 = main;
             }
-            texts.map(function(it){
-              return g.appendChild(it);
-            });
-            if (!opt.node) {
-              document.body.removeChild(div);
-            } else {
-              div.textContent = div.textContent;
+            function import$(obj, src) {
+              var own = {}.hasOwnProperty;
+              for (var key in src) if (own.call(src, key)) obj[key] = src[key];
+              return obj;
             }
-            return g;
-          };
-          if (typeof module != 'undefined' && module !== null) {
-            module.exports = main;
-          } else if (typeof window != 'undefined' && window !== null) {
-            window.wrapSvgText1 = main;
-          }
-          function import$(obj, src){
-            var own = {}.hasOwnProperty;
-            for (var key in src) if (own.call(src, key)) obj[key] = src[key];
-            return obj;
-          }
-        }).call(this);
-        
-        // const script1 = document.createElement("script");
-        // script1.src = "./node_modules/wrap-svg-text/index.min.js";
-        // document.body.appendChild(script1)
-        console.log('hi')
-        // const asdfg = wrapSvgText.toString();
-        // throw new Error(asdfg)
-        
-        
-        const dat = wrapSvgText1({
-          text:  preview,
-          style: {
+          }).call(this);
+
+          // const script1 = document.createElement("script");
+          // script1.src = "./node_modules/wrap-svg-text/index.min.js";
+          // document.body.appendChild(script1)
+          console.log("hi");
+          // const asdfg = wrapSvgText.toString();
+          // throw new Error(asdfg)
+
+          const dat = wrapSvgText1({
+            text: preview,
+            style: {
               fontSize: "50px",
               width: "1980px",
-          }
-        });
-        dat.id = 'test'
-        const dat2 = wrapSvgText1({
-          text:  headline,
-          style: {
+            },
+          });
+          dat.id = "test";
+          const dat2 = wrapSvgText1({
+            text: headline,
+            style: {
               fontSize: "50px",
               width: "1040px",
+            },
+          });
+          dat2.id = "test1";
+
+          const myGroup = document.getElementById("thisId");
+          console.log(dat.children);
+          for (let child of dat.children) {
+            console.log(child.getAttribute("x"));
+            child.setAttribute(
+              "x",
+              parseInt(child.getAttribute("x")) + 4033.03
+            );
+            child.setAttribute(
+              "y",
+              parseInt(child.getAttribute("y")) + 2524.77
+            );
           }
-        });
-        dat2.id = 'test1'
-        
-        const myGroup = document.getElementById('thisId')
-        console.log(dat.children)
-        for (let child of dat.children) {
-        console.log(child.getAttribute('x'));
-            child.setAttribute('x', parseInt(child.getAttribute('x'))+ 4033.03);
-        child.setAttribute('y', parseInt(child.getAttribute('y')) + 2524.77);
-        }
-        
-        myGroup.appendChild(dat)
-        console.log('translate(0,' + Math.round(40 - dat.getBBox().height).toString() + ')')
-        dat.setAttribute('transform',  'translate(0,' + Math.round(40 - dat.getBBox().height).toString() + ')')
-        
-        const myGroup2 = document.getElementById('thisId2')
-        console.log(dat2.children)
-        for (let child of dat2.children) {
-        console.log(child.getAttribute('x'));
-            child.setAttribute('x', parseInt(child.getAttribute('x'))+ 4033.03);
-        child.setAttribute('y', parseInt(child.getAttribute('y')) + 2540.52);
-        }
-        
-        myGroup2.appendChild(dat2)
-        console.log('translate(0,' + Math.round(40 - dat2.getBBox().height).toString() + ')')
-        dat2.setAttribute('transform',  'translate(0,' + Math.round(150 - (dat2.getBBox().height+dat.getBBox().height)).toString() + ')')
-        
-      }, data[0], data[2]);
+
+          myGroup.appendChild(dat);
+          console.log(
+            "translate(0," +
+              Math.round(40 - dat.getBBox().height).toString() +
+              ")"
+          );
+          dat.setAttribute(
+            "transform",
+            "translate(0," +
+              Math.round(40 - dat.getBBox().height).toString() +
+              ")"
+          );
+
+          const myGroup2 = document.getElementById("thisId2");
+          console.log(dat2.children);
+          for (let child of dat2.children) {
+            console.log(child.getAttribute("x"));
+            child.setAttribute(
+              "x",
+              parseInt(child.getAttribute("x")) + 4033.03
+            );
+            child.setAttribute(
+              "y",
+              parseInt(child.getAttribute("y")) + 2540.52
+            );
+          }
+
+          myGroup2.appendChild(dat2);
+          console.log(
+            "translate(0," +
+              Math.round(40 - dat2.getBBox().height).toString() +
+              ")"
+          );
+          dat2.setAttribute(
+            "transform",
+            "translate(0," +
+              Math.round(
+                150 - (dat2.getBBox().height + dat.getBBox().height)
+              ).toString() +
+              ")"
+          );
+        },
+        data[0],
+        data[2]
+      );
     },
     html: `<html>
     <head>
@@ -391,74 +463,101 @@ async function go() {
       preview: data[2],
       publishedMessage: data[1].toUpperCase(),
     },
-  }).then(() => {
-    console.log("The images were created successfully!");
+  })
+    .then(() => {
+      console.log(JSON.stringify(data));
 
-    const image3 = fs.readFileSync("./images/" + imagename + ".png");
-    const base64Image3 = new Buffer.from(image3).toString("base64");
-    var formdata = new FormData();
-    formdata.append("image", base64Image3);
-    formdata.append("name", imagename);
-    fetch("https://api.imgbb.com/1/upload?key=" + process.env.IMGBB_APIKEY, {
-      body: formdata,
-      method: "POST",
-    })
-      .then((response) => response.json())
-      .then((res) => {
-        fetch("https://api.wasteof.money/session", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: process.env.WASTEOF_USERNAME,
-            password: process.env.WASTEOF_PASSWORD,
-          }),
-        })
-          .then((res) => res.json())
-          .then((res1) => {
+        console.log(imagename, data[0])
+        posts.push({
+          id: imagename,
+          title: data[0],
+          date: data[1],
+          preview: data[2],
+          image: data[3],
+          link: data[4],
+        });
+        fs.writeFile("./images/posts.json", JSON.stringify(posts), (error) => {
+          if (error) {
+            console.log("An error has occurred ", error);
+            return;
+          }
+          console.log("Data written successfully to disk");
+        });
+      // });
+      console.log("The images were created successfully!");
 
-            if (res1.error) {
-              console.error(res1.error);
-              throw new Error("error while authenticating with wasteof", res1.error);
-              return;
-            }
-            fetch("https://api.wasteof.money/posts", {
-              method: "POST",
-              headers: {
-                Authorization: res1.token,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                post: "<p>" + data[4] + '</p><img src="' + res.data.url + '">',
-              }),
-            })
-              .then((res) => res.json())
-              .then((res2) => {
-                if (res2.error) {
-                  console.error(res2.error);
-                  throw new Error("error while posting post", res2.error);
-                  return;
-                }
-                console.log(res2.id)
-                fetch("https://api.wasteof.money/posts/" + res2.id + "/loves", {
-                  method: "POST",
-                  headers: {
-                    Authorization: res1.token,
-                    "Content-Type": "application/json",
-                  }
-                })
-              });
-          });
+      const image3 = fs.readFileSync("./images/" + imagename + ".png");
+      const base64Image3 = new Buffer.from(image3).toString("base64");
+      var formdata = new FormData();
+      formdata.append("image", base64Image3);
+      formdata.append("name", imagename);
+      fetch("https://api.imgbb.com/1/upload?key=" + process.env.IMGBB_APIKEY, {
+        body: formdata,
+        method: "POST",
       })
-      .catch((error) => {
-        console.error(error);
-        throw new Error("error while uploading image", error)
-      });
-  }).catch((error) => {
-    console.error(error);
-    throw new Error("error while generating image", error)
-  });
+        .then((response) => response.json())
+        .then((res) => {
+          fetch("https://api.wasteof.money/session", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: process.env.WASTEOF_USERNAME,
+              password: process.env.WASTEOF_PASSWORD,
+            }),
+          })
+            .then((res) => res.json())
+            .then((res1) => {
+              if (res1.error) {
+                console.error(res1.error);
+                throw new Error(
+                  "error while authenticating with wasteof",
+                  res1.error
+                );
+                return;
+              }
+              fetch("https://api.wasteof.money/posts", {
+                method: "POST",
+                headers: {
+                  Authorization: res1.token,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  post:
+                    "<p>" + data[4] + '</p><img src="' + res.data.url + '">',
+                }),
+              })
+                .then((res) => res.json())
+                .then((res2) => {
+                  if (res2.error) {
+                    console.error(res2.error);
+                    throw new Error("error while posting post", res2.error);
+                    return;
+                  }
+                  console.log(res2.id);
+                  fetch(
+                    "https://api.wasteof.money/posts/" + res2.id + "/loves",
+                    {
+                      method: "POST",
+                      headers: {
+                        Authorization: res1.token,
+                        "Content-Type": "application/json",
+                      },
+                    }
+                  );
+                });
+            });
+        })
+        .catch((error) => {
+          console.error(error);
+          throw new Error("error while uploading image", error);
+        });
+    })
+    .catch((error) => {
+      console.error(error);
+      throw new Error("error while generating image", error);
+    });
 }
 
 go();
