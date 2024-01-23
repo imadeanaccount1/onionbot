@@ -3,7 +3,7 @@
     "bad-words": "^3.0.4",
     "d3plus-text": "^1.2.4",
     "deasync": "^0.1.29",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.4.0",
     "node-html-to-image": "^4.0.0",
     "puppeteer": "^21.5.2",
     "wrap-svg-text": "^0.0.7"
